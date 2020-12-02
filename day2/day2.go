@@ -21,7 +21,7 @@ func Part1() {
 
 		pass := input[i][2]
 
-		isValid := validatePass(ruleRange, letter, pass)
+		isValid := validatePart1(ruleRange, letter, pass)
 
 		if isValid {
 			count++
@@ -31,14 +31,61 @@ func Part1() {
 	fmt.Println(count)
 }
 
-func validatePass(ruleRange []int, letter string, pass string) bool {
+func Part2() {
+	input := parseInput()
+
+	count := 0
+
+	for i := 0; i < len(input); i++ {
+		rule := input[i][0]
+
+		ruleRange := getRange(rule)
+
+		letter := strings.ReplaceAll(input[i][1], ":", "")
+
+		pass := input[i][2]
+
+		isValid := validatePart2(ruleRange, letter, pass)
+
+		if isValid {
+			count++
+		}
+
+	}
+	fmt.Println(count)
+}
+
+func validatePart2(ruleRange []int, letter string, pass string) bool {
+
+	firstIndex := ruleRange[0] - 1
+	secondIndex := ruleRange[1] - 1
+
+	splitPass := strings.Split(pass, "")
+
+	firstLetter := splitPass[firstIndex]
+	secondLetter := splitPass[secondIndex]
+
+	firstLetterMatches := firstLetter == letter
+	secondLetterMatches := secondLetter == letter
+
+	if firstLetterMatches && !secondLetterMatches {
+		return true
+	}
+
+	if !firstLetterMatches && secondLetterMatches {
+		return true
+	}
+
+	return false
+
+}
+
+func validatePart1(ruleRange []int, letter string, pass string) bool {
 
 	repeatCount := strings.Count(pass, letter)
 
 	lower := ruleRange[0]
 	upper := ruleRange[1]
-
-	fmt.Println(repeatCount, lower, upper)
 
 	return repeatCount >= lower && repeatCount <= upper
 }
