@@ -8,6 +8,35 @@ import (
 func Part1() {
 	fmt.Println("Heya")
 
+	treeCount := countTrees(3, 1)
+
+	fmt.Println(treeCount)
+
+}
+
+func Part2() {
+	fmt.Println("Part 2!")
+
+	slopes := [...][2]int{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+
+	solution := 1
+
+	for i := 0; i < len(slopes); i++ {
+
+		fmt.Println(slopes[i])
+
+		right := slopes[i][0]
+		down := slopes[i][1]
+
+		solution = solution * countTrees(right, down)
+	}
+
+	fmt.Println(solution)
+
+}
+
+func countTrees(right int, down int) int {
+
 	input := parseInput()
 
 	inputLength := len(input)
@@ -28,21 +57,14 @@ func Part1() {
 			treeCount = treeCount + 1
 		}
 
-		y++
-		x = x + 3
-		if y == inputLength-1 {
+		y = y + down
+		x = x + right
+		if y == inputLength-down {
 			break
 		}
 	}
 
-	fmt.Println(treeCount)
-
-}
-
-var lengthOfRow = 31
-
-func addToX(x int) {
-
+	return treeCount
 }
 
 func parseInput() []string {
@@ -53,12 +75,6 @@ func parseInput() []string {
 
 	for i := 1; i < len(splitByNewline); i++ {
 		row := splitByNewline[i]
-
-		// parsedRow := strings.Fields(row)
-
-		// if len(parsedRow) == 0 {
-		// 	continue
-		// }
 
 		parsedInput = append(parsedInput, row)
 	}
