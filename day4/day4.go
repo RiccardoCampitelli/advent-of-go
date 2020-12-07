@@ -2,6 +2,8 @@ package day4
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -32,16 +34,43 @@ func Part1() {
 
 }
 
+func Part2() {
+	input := parseInput()
+
+	count := 0
+
+	var currentPassport []string
+
+	for i := 0; i < len(input); i++ {
+
+		if input[i] == "" {
+			isValid := validatePassport(currentPassport)
+			if isValid {
+				count = count + 1
+			}
+			currentPassport = nil
+			continue
+		}
+
+		currentPassport = append(currentPassport, input[i])
+
+	}
+
+	fmt.Println(count)
+}
+
 var requiredFields = [...]string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}
 
 func validatePassport(passport []string) bool {
 
 	var fields []string
+	var values []string
 
 	for i := 0; i < len(passport); i++ {
-		newFields := getFields(passport[i])
-		for _, newField := range newFields {
+		newFields, newValues := getFields(passport[i])
+		for j, newField := range newFields {
 			fields = append(fields, newField)
+			values = append(values, newValues[j])
 		}
 	}
 
@@ -58,7 +87,139 @@ func validatePassport(passport []string) bool {
 		}
 	}
 
+	return validateFields(fields, values)
+
+}
+
+var validEyeColors = [...]string{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
+
+func validateFields(fields []string, values []string) bool {
+
+	for i, field := range fields {
+		switch field {
+		case "byr":
+			{
+				birthYear, err := strconv.Atoi(values[i])
+
+				if err != nil {
+					return false
+				}
+
+				if birthYear < 1920 || birthYear > 2002 {
+					return false
+				}
+			}
+		case "iyr":
+			{
+				issueYear, err := strconv.Atoi(values[i])
+
+				if err != nil {
+					return false
+				}
+
+				if issueYear < 2010 || issueYear > 2020 {
+					return false
+				}
+			}
+		case "eyr":
+			{
+				expirationYear, err := strconv.Atoi(values[i])
+
+				if err != nil {
+					return false
+				}
+
+				if expirationYear < 2020 || expirationYear > 2030 {
+					return false
+				}
+			}
+		case "hgt":
+			{
+				height := values[i]
+
+				if len(height) <= 3 {
+					return false
+				}
+
+				lastTwoChars := height[len(height)-2:]
+
+				switch lastTwoChars {
+				case "in":
+					{
+						value := height[0 : len(height)-2]
+
+						parsedValue, err := strconv.Atoi(value)
+
+						if err != nil {
+							return false
+						}
+
+						if parsedValue < 59 || parsedValue > 76 {
+							return false
+						}
+					}
+				case "cm":
+					{
+						value := height[0 : len(height)-2]
+
+						parsedValue, err := strconv.Atoi(value)
+
+						if err != nil {
+							return false
+						}
+
+						if parsedValue < 150 || parsedValue > 193 {
+							return false
+						}
+					}
+				}
+			}
+
+		case "hcl":
+			{
+				hairColor := values[i]
+				match, _ := regexp.MatchString("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$", hairColor)
+
+				if !match {
+					return false
+				}
+			}
+		case "ecl":
+			{
+				eyeColor := values[i]
+
+				if !isValidEyeColor(eyeColor) {
+					return false
+				}
+			}
+		case "pid":
+			{
+				passportId := values[i]
+
+				match, _ := regexp.MatchString("^[0-9]*$", passportId)
+
+				if len(passportId) != 9 {
+					return false
+				}
+
+				if !match {
+					return false
+				}
+			}
+		}
+	}
+
 	return true
+
+}
+
+func isValidEyeColor(eyeColor string) bool {
+	for _, listValue := range validEyeColors {
+		if listValue == eyeColor {
+			return true
+		}
+	}
+	return false
 }
 
 func stringInSlice(value string, list []string) bool {
@@ -70,9 +231,10 @@ func stringInSlice(value string, list []string) bool {
 	return false
 }
 
-func getFields(row string) []string {
+func getFields(row string) ([]string, []string) {
 
 	var fieldNames []string
+	var fieldValues []string
 
 	fields := strings.Fields(row)
 
@@ -80,9 +242,10 @@ func getFields(row string) []string {
 		temp := strings.Split(fields[i], ":")
 
 		fieldNames = append(fieldNames, temp[0])
+		fieldValues = append(fieldValues, temp[1])
 	}
 
-	return fieldNames
+	return fieldNames, fieldValues
 
 }
 
