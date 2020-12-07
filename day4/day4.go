@@ -39,27 +39,15 @@ func validatePassport(passport []string) bool {
 	var fields []string
 
 	for i := 0; i < len(passport); i++ {
-		fields = getFields(passport[i])
+		newFields := getFields(passport[i])
+		for _, newField := range newFields {
+			fields = append(fields, newField)
+		}
 	}
 
 	if len(fields) < 7 {
 		return false
 	}
-
-	// for i := 0; i < len(fields); i++ {
-	// 	field := fields[i]
-
-	// 	fmt.Println(field, stringInSlice(field, requiredFields))
-
-	// 	if !stringInSlice(field, requiredFields) {
-	// 		if field == "cid" {
-	// 			fmt.Println(field, "cid")
-	// 			continue
-	// 		}
-
-	// 		return false
-	// 	}
-	// }
 
 	for _, requiredField := range requiredFields {
 		if !stringInSlice(requiredField, fields) {
