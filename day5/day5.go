@@ -26,6 +26,56 @@ func Part1() {
 
 }
 
+type seat struct {
+	row int
+	col int
+}
+
+func Part2() {
+	seatMap := make(map[seat]int)
+
+	input := parseInput()
+
+	for _, ticket := range input {
+
+		row, col := calculateSeat(ticket)
+
+		newSeat := seat{row: row, col: col}
+
+		_, exists := seatMap[newSeat]
+
+		seatMap[newSeat] = calculateId(row, col)
+
+	}
+
+	for i := 0; i < 128; i++ {
+
+		for j := 0; j < 8; j++ {
+
+			seatToCheck := seat{row: i, col: j}
+
+			_, exists := seatMap[seatToCheck]
+
+			fmt.Println(exists, i, j)
+
+		}
+
+	}
+
+}
+
+func calculateSeat(ticket string) (int, int) {
+	rowCode := ticket[0:7]
+
+	row := calculateRow(rowCode)
+
+	colCode := ticket[7:]
+
+	col := calculateCol(colCode)
+
+	return row, col
+}
+
 func calculateTicketId(ticket string) int {
 	rowCode := ticket[0:7]
 
@@ -34,6 +84,8 @@ func calculateTicketId(ticket string) int {
 	colCode := ticket[7:]
 
 	col := calculateCol(colCode)
+
+	fmt.Println(row, col)
 
 	id := calculateId(row, col)
 
