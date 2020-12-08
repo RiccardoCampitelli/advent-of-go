@@ -42,8 +42,6 @@ func Part2() {
 
 		newSeat := seat{row: row, col: col}
 
-		_, exists := seatMap[newSeat]
-
 		seatMap[newSeat] = calculateId(row, col)
 
 	}
